@@ -52,8 +52,10 @@
             void  _MyTrig();
             void _verifyValidTarget(float* xTarget,float* yTarget);
             //target router bit coordinates.
-            float x = 2708.4;
-            float y = 270;
+            float x = 0;
+            float y = 0;
+            float _xCordOfMotor = D/2;
+            float _yCordOfMotor = halfHeight + motorOffsetY;
 
 
 

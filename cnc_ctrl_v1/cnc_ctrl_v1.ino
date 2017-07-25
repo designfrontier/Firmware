@@ -18,10 +18,22 @@
 void setup(){
     Serial.begin(57600);
     
+    delay(500);
+    float temp;
+    kinematics.inverse(0,0, &temp, &temp);
+    kinematics.inverse(500,0, &temp, &temp);
+    kinematics.inverse(-500,0, &temp, &temp);
+    kinematics.inverse(0,500, &temp, &temp);
+    kinematics.inverse(0,-500, &temp, &temp);
+    
+    while(true){
+        delay(10);
+    }
+    
     kinematics.forward(leftAxis.read(), rightAxis.read(), &xTarget, &yTarget);
     
     if(pcbRevisionIndicator == 0){
-    Serial.println(F("PCB v1.1 Detected"));
+        Serial.println(F("PCB v1.1 Detected"));
     } 
     if(pcbRevisionIndicator == 1){
         Serial.println(F("Beta PCB v1.0 Detected"));

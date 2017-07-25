@@ -52,108 +52,17 @@ void  Kinematics::inverse(float xTarget,float yTarget, float* aChainLength, floa
 
     //Confirm that the coordinates are on the wood
     _verifyValidTarget(&xTarget, &yTarget);
-
-    //coordinate shift to put (0,0) in the center of the plywood from the left sprocket
-    x = (D/2.0) + xTarget;
-    y = (halfHeight) + motorOffsetY  - yTarget;
-
-    //Coordinates definition:
-    //         x -->, y |
-    //                  v
-    // (0,0) at center of left sprocket
-    // upper left corner of plywood (270, 270)
-
-    Tries = 0;                                  //initialize
-    if(x > D/2.0){                              //the right half of the board mirrors the left half so all computations are done  using left half coordinates.
-      x = D-x;                                  //Chain lengths are swapped at exit if the x,y is on the right half
-      Mirror = true;
-    }
-    else{
-        Mirror = false;
-    }
-
-    TanGamma = y/x;
-    TanLambda = y/(D-x);
-    Y1Plus = R * sqrt(1 + TanGamma * TanGamma);
-    Y2Plus = R * sqrt(1 + TanLambda * TanLambda);
-
-
-    while (Tries <= MaxTries) {
-
-        _MyTrig();
-                                             //These criteria will be zero when the correct values are reached
-                                             //They are negated here as a numerical efficiency expedient
-
-        Crit[0]=  - _moment(Y1Plus, Y2Plus, Phi, MySinPhi, SinPsi1, CosPsi1, SinPsi2, CosPsi2);
-        Crit[1] = - _YOffsetEqn(Y1Plus, x - h * CosPsi1, SinPsi1);
-        Crit[2] = - _YOffsetEqn(Y2Plus, D - (x + h * CosPsi2), SinPsi2);
-
-        if (abs(Crit[0]) < MaxError) {
-            if (abs(Crit[1]) < MaxError) {
-                if (abs(Crit[2]) < MaxError){
-                    break;
-                }
-            }
-        }
-
-                   //estimate the tilt angle that results in zero net _moment about the pen
-                   //and refine the estimate until the error is acceptable or time runs out
-
-                          //Estimate the Jacobian components
-
-        Jac[0] = (_moment( Y1Plus, Y2Plus,Phi + DeltaPhi, MySinPhiDelta, SinPsi1D, CosPsi1D, SinPsi2D, CosPsi2D) + Crit[0])/DeltaPhi;
-        Jac[1] = (_moment( Y1Plus + DeltaY, Y2Plus, Phi, MySinPhi, SinPsi1, CosPsi1, SinPsi2, CosPsi2) + Crit[0])/DeltaY;
-        Jac[2] = (_moment(Y1Plus, Y2Plus + DeltaY,  Phi, MySinPhi, SinPsi1, CosPsi1, SinPsi2, CosPsi2) + Crit[0])/DeltaY;
-        Jac[3] = (_YOffsetEqn(Y1Plus, x - h * CosPsi1D, SinPsi1D) + Crit[1])/DeltaPhi;
-        Jac[4] = (_YOffsetEqn(Y1Plus + DeltaY, x - h * CosPsi1,SinPsi1) + Crit[1])/DeltaY;
-        Jac[5] = 0.0;
-        Jac[6] = (_YOffsetEqn(Y2Plus, D - (x + h * CosPsi2D), SinPsi2D) + Crit[2])/DeltaPhi;
-        Jac[7] = 0.0;
-        Jac[8] = (_YOffsetEqn(Y2Plus + DeltaY, D - (x + h * CosPsi2D), SinPsi2) + Crit[2])/DeltaY;
-
-
-        //solve for the next guess
-        _MatSolv();     // solves the matrix equation Jx=-Criterion
-
-        // update the variables with the new estimate
-
-        Phi = Phi + Solution[0];
-        Y1Plus = Y1Plus + Solution[1];                         //don't allow the anchor points to be inside a sprocket
-        Y1Plus = (Y1Plus < R) ? R : Y1Plus;
-
-        Y2Plus = Y2Plus + Solution[2];                         //don't allow the anchor points to be inside a sprocke
-        Y2Plus = (Y2Plus < R) ? R : Y2Plus;
-
-        Psi1 = Theta - Phi;
-        Psi2 = Theta + Phi;
-
-    Tries = Tries + 1;                                       // increment itteration count
-
-    }
-
-    //Variables are within accuracy limits
-    //  perform output computation
-
-    Offsetx1 = h * CosPsi1;
-    Offsetx2 = h * CosPsi2;
-    Offsety1 = h *  SinPsi1;
-    Offsety2 = h * SinPsi2;
-    TanGamma = (y - Offsety1 + Y1Plus)/(x - Offsetx1);
-    TanLambda = (y - Offsety2 + Y2Plus)/(D -(x + Offsetx2));
-    Gamma = atan(TanGamma);
-    Lambda =atan(TanLambda);
-
-    //compute the chain lengths
-
-    if(Mirror){
-        Chain2 = sqrt((x - Offsetx1)*(x - Offsetx1) + (y + Y1Plus - Offsety1)*(y + Y1Plus - Offsety1)) - R * TanGamma + R * Gamma;   //right chain length
-        Chain1 = sqrt((D - (x + Offsetx2))*(D - (x + Offsetx2))+(y + Y2Plus - Offsety2)*(y + Y2Plus - Offsety2)) - R * TanLambda + R * Lambda;   //left chain length
-    }
-    else{
-        Chain1 = sqrt((x - Offsetx1)*(x - Offsetx1) + (y + Y1Plus - Offsety1)*(y + Y1Plus - Offsety1)) - R * TanGamma + R * Gamma;   //left chain length
-        Chain2 = sqrt((D - (x + Offsetx2))*(D - (x + Offsetx2))+(y + Y2Plus - Offsety2)*(y + Y2Plus - Offsety2)) - R * TanLambda + R * Lambda;   //right chain length
-    }
-
+    
+    Serial.println("Kinematics");
+    Serial.println(xTarget);
+    Serial.println(yTarget);
+    
+    float Chain1 = sqrt(pow((-1*_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
+    float Chain2 = sqrt(pow((_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
+    
+    Serial.println(Chain1);
+    Serial.println(Chain2);
+    
     *aChainLength = Chain1;
     *bChainLength = Chain2;
 
