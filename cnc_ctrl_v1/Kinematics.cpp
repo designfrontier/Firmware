@@ -53,15 +53,8 @@ void  Kinematics::inverse(float xTarget,float yTarget, float* aChainLength, floa
     //Confirm that the coordinates are on the wood
     _verifyValidTarget(&xTarget, &yTarget);
     
-    Serial.println("Kinematics");
-    Serial.println(xTarget);
-    Serial.println(yTarget);
-    
     float Chain1 = sqrt(pow((-1*_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
     float Chain2 = sqrt(pow((_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
-    
-    Serial.println(Chain1);
-    Serial.println(Chain2);
     
     *aChainLength = Chain1;
     *bChainLength = Chain2;

@@ -18,18 +18,6 @@
 void setup(){
     Serial.begin(57600);
     
-    delay(500);
-    float temp;
-    kinematics.inverse(0,0, &temp, &temp);
-    kinematics.inverse(500,0, &temp, &temp);
-    kinematics.inverse(-500,0, &temp, &temp);
-    kinematics.inverse(0,500, &temp, &temp);
-    kinematics.inverse(0,-500, &temp, &temp);
-    
-    while(true){
-        delay(10);
-    }
-    
     kinematics.forward(leftAxis.read(), rightAxis.read(), &xTarget, &yTarget);
     
     if(pcbRevisionIndicator == 0){
