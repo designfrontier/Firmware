@@ -56,6 +56,10 @@ void  Kinematics::inverse(float xTarget,float yTarget, float* aChainLength, floa
     float Chain1 = sqrt(pow((-1*_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
     float Chain2 = sqrt(pow((_xCordOfMotor - xTarget),2)+pow((_yCordOfMotor - yTarget),2));
     
+    //Subtract of the virtual length which is added to the chain by the rotation mechanism
+    Chain1 = Chain1 - rotationDiskRadius;
+    Chain2 = Chain2 - rotationDiskRadius;
+    
     *aChainLength = Chain1;
     *bChainLength = Chain2;
 

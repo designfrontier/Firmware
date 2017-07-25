@@ -36,7 +36,7 @@
             float h3            = 79.0;                                //distance from bit to sled center of mass
             float D             = 2978.4;                              //distance between sprocket centers
             float R             = 10.2;                                //sprocket radius
-
+            float rotationDiskRadius = 210/2;                          //distance from the bit to the attachment point
 
             //machine dimensions
             float machineHeight = 1219.2;                              //this is 4 feet in mm
